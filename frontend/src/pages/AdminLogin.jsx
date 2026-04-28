@@ -78,7 +78,7 @@ const AdminLogin = () => {
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   className="flex-1 bg-transparent outline-none py-3 text-[#f3ede1] placeholder:text-[#5b554d]"
-                  placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+                  placeholder="••••••••"
                 />
               </div>
             </div>
