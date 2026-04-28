@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import api from "../../lib/api";
 import { useContent } from "../../contexts/ContentContext";
-import { Save, Plus, Trash2, FileText, RotateCcw } from "lucide-react";
+import { Save, Plus, Trash2, FileText, RotateCcw, Link as LinkIcon } from "lucide-react";
+import { PLATFORM_OPTIONS } from "../PlatformIcon";
 import { toast } from "sonner";
 
 const ContentManager = () => {
@@ -20,6 +21,7 @@ const ContentManager = () => {
   const roadmap = draft.roadmap || [];
   const stats = draft.stats || [];
   const tools = draft.tools || [];
+  const socialProfiles = draft.socialProfiles || [];
 
   const saveKey = async (key, value) => {
     setSaving(key);
@@ -72,6 +74,67 @@ const ContentManager = () => {
           <Field label="Photo URL" value={profile.photoUrl} onChange={(v) => setProfileField("photoUrl", v)} className="md:col-span-2" />
           <Textarea label="Short bio (Hero subtitle)" value={profile.shortBio} onChange={(v) => setProfileField("shortBio", v)} className="md:col-span-2" />
           <Textarea label="Long bio (About section)" rows={6} value={profile.longBio} onChange={(v) => setProfileField("longBio", v)} className="md:col-span-2" />
+        </div>
+      </Card>
+
+      {/* Social / Freelance Profiles */}
+      <Card title="Freelance & Social Profiles" onSave={() => saveKey("socialProfiles", socialProfiles)} saving={saving === "socialProfiles"}>
+        <p className="text-xs text-[#8a8278] mb-4 -mt-2">
+          Add Upwork, Fiverr, Behance, LinkedIn etc. Each card shows up at the top of the site, in the Contact section, and footer.
+        </p>
+        <div className="space-y-4">
+          {socialProfiles.map((sp, idx) => (
+            <div key={idx} className="p-4 rounded-xl bg-[#0c0b0a] border border-[#1c1916]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] uppercase tracking-[0.25em] text-[#8a8278]">Platform</label>
+                  <select
+                    value={sp.platform || "other"}
+                    onChange={(e) => {
+                      const copy = [...socialProfiles];
+                      const platform = e.target.value;
+                      const matchedLabel = PLATFORM_OPTIONS.find((p) => p.value === platform)?.label || platform;
+                      copy[idx] = { ...copy[idx], platform, label: copy[idx].label || matchedLabel };
+                      setDraft({ ...draft, socialProfiles: copy });
+                    }}
+                    className="mt-2 w-full bg-[#0a0a0a] border border-[#2a2520] focus:border-[#ff5e3a] outline-none px-3 py-2.5 rounded-lg text-sm text-[#f3ede1]"
+                  >
+                    {PLATFORM_OPTIONS.map((p) => (
+                      <option key={p.value} value={p.value}>{p.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <Field label="Label (display name)" value={sp.label} onChange={(v) => {
+                  const copy = [...socialProfiles]; copy[idx] = { ...copy[idx], label: v }; setDraft({ ...draft, socialProfiles: copy });
+                }} placeholder="e.g. Upwork" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                <Field label="Handle / Display Name" value={sp.handle} onChange={(v) => {
+                  const copy = [...socialProfiles]; copy[idx] = { ...copy[idx], handle: v }; setDraft({ ...draft, socialProfiles: copy });
+                }} placeholder="e.g. Areeb Rayyan" />
+                <Field label="Tagline (optional)" value={sp.tagline} onChange={(v) => {
+                  const copy = [...socialProfiles]; copy[idx] = { ...copy[idx], tagline: v }; setDraft({ ...draft, socialProfiles: copy });
+                }} placeholder="e.g. Hire me here" />
+              </div>
+              <div className="mt-3">
+                <Field label="Profile URL" value={sp.url} onChange={(v) => {
+                  const copy = [...socialProfiles]; copy[idx] = { ...copy[idx], url: v }; setDraft({ ...draft, socialProfiles: copy });
+                }} placeholder="https://..." />
+              </div>
+              <button
+                onClick={() => setDraft({ ...draft, socialProfiles: socialProfiles.filter((_, i) => i !== idx) })}
+                className="mt-3 inline-flex items-center gap-2 px-3 py-2 rounded-full border border-[#2a2520] text-xs text-[#d8cfc1] hover:border-red-500 hover:text-red-500"
+              >
+                <Trash2 size={13} /> Remove
+              </button>
+            </div>
+          ))}
+          <button
+            onClick={() => setDraft({ ...draft, socialProfiles: [...socialProfiles, { id: `sp_${Date.now()}`, platform: "fiverr", label: "Fiverr", handle: "", tagline: "", url: "" }] })}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#2a2520] text-xs text-[#d8cfc1] hover:border-[#ff5e3a] hover:text-[#ff5e3a]"
+          >
+            <Plus size={13} /> Add new profile
+          </button>
         </div>
       </Card>
 

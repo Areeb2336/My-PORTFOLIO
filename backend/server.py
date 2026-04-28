@@ -13,6 +13,8 @@ from pydantic import BaseModel, EmailStr, Field
 from typing import List, Optional, Any
 from datetime import datetime, timedelta, timezone
 import jwt
+import aiosmtplib
+from email.message import EmailMessage
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
@@ -25,6 +27,14 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin")
 JWT_SECRET = os.environ.get("JWT_SECRET", "change-me")
 JWT_ALG = "HS256"
 JWT_EXP_DAYS = 7
+
+# SMTP / Email config
+SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", "587") or 587)
+SMTP_USER = os.environ.get("SMTP_USER", "")
+SMTP_PASS = os.environ.get("SMTP_PASS", "")
+SMTP_FROM_NAME = os.environ.get("SMTP_FROM_NAME", "Portfolio")
+NOTIFY_EMAIL = os.environ.get("NOTIFY_EMAIL", "")
 
 UPLOAD_ROOT = ROOT_DIR / "uploads"
 PORTFOLIO_DIR = UPLOAD_ROOT / "portfolio"
@@ -43,6 +53,51 @@ api_router = APIRouter(prefix="/api")
 
 # Static uploads served at /api/uploads
 app.mount("/api/uploads", StaticFiles(directory=str(UPLOAD_ROOT)), name="uploads")
+
+# ---------- Email ----------
+async def send_notification_email(msg: "ContactMessage") -> bool:
+    """Send notification email to admin when new contact form submitted.
+    Returns True on success, False on any failure (silently)."""
+    if not (SMTP_USER and SMTP_PASS and NOTIFY_EMAIL):
+        logging.info("SMTP not configured, skipping email notification")
+        return False
+    try:
+        email = EmailMessage()
+        email["From"] = f"{SMTP_FROM_NAME} <{SMTP_USER}>"
+        email["To"] = NOTIFY_EMAIL
+        email["Reply-To"] = msg.email
+        email["Subject"] = f"New enquiry from {msg.name} — {msg.project or 'Portfolio'}"
+        body = f"""You have a new message from your portfolio website.
+
+Name:     {msg.name}
+Email:    {msg.email}
+Project:  {msg.project or '(not specified)'}
+Time:     {msg.created_at.strftime('%d %b %Y, %I:%M %p UTC')}
+
+Message:
+--------
+{msg.message}
+
+--------
+Reply directly to this email to respond to {msg.name}.
+Or open your admin inbox: /admin/dashboard
+"""
+        email.set_content(body)
+        await aiosmtplib.send(
+            email,
+            hostname=SMTP_HOST,
+            port=SMTP_PORT,
+            username=SMTP_USER,
+            password=SMTP_PASS,
+            start_tls=True,
+            timeout=15,
+        )
+        logging.info(f"Notification email sent to {NOTIFY_EMAIL}")
+        return True
+    except Exception as e:
+        logging.error(f"Failed to send notification email: {e}")
+        return False
+
 
 # ---------- Auth helpers ----------
 bearer = HTTPBearer(auto_error=False)
@@ -247,6 +302,11 @@ async def submit_contact(payload: ContactIn):
         message=payload.message.strip(),
     )
     await db.messages.insert_one(msg.model_dump())
+    # Fire-and-forget email notification (does not block response if it fails)
+    try:
+        await send_notification_email(msg)
+    except Exception as e:
+        logging.warning(f"Email notification error: {e}")
     return msg
 
 
@@ -344,6 +404,16 @@ DEFAULT_CONTENT = {
         {"label": "University", "value": "Galgotias University"},
         {"label": "Years", "value": "2025 — 2029"},
         {"label": "Mode", "value": "Solo · Side hustle"},
+    ],
+    "socialProfiles": [
+        {
+            "id": "upwork",
+            "platform": "upwork",
+            "label": "Upwork",
+            "handle": "Areeb Rayyan",
+            "url": "https://www.upwork.com/freelancers/~012baa0df6289e446e?mp_source=share",
+            "tagline": "Hire me on Upwork",
+        },
     ],
 }
 

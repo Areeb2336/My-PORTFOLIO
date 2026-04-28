@@ -2,10 +2,12 @@ import React from "react";
 import { useContent } from "../contexts/ContentContext";
 import { profile as fallbackProfile } from "../mock";
 import { Instagram, Mail, ArrowUp } from "lucide-react";
+import PlatformIcon from "./PlatformIcon";
 
 const Footer = () => {
   const { content } = useContent();
   const profile = content.profile || fallbackProfile;
+  const socialProfiles = content.socialProfiles || [];
   const year = new Date().getFullYear();
   const toTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
@@ -39,6 +41,19 @@ const Footer = () => {
             >
               <Instagram size={18} />
             </a>
+            {socialProfiles.map((sp) => (
+              <a
+                key={sp.id || sp.url}
+                href={sp.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-12 h-12 rounded-full border border-[#2a2520] flex items-center justify-center text-[#d8cfc1] hover:bg-[#ff5e3a] hover:border-[#ff5e3a] hover:text-[#0a0a0a] transition-all duration-300"
+                aria-label={sp.label || sp.platform}
+                title={sp.label || sp.platform}
+              >
+                <PlatformIcon platform={sp.platform} size={18} />
+              </a>
+            ))}
             <button
               onClick={toTop}
               className="w-12 h-12 rounded-full border border-[#2a2520] flex items-center justify-center text-[#d8cfc1] hover:bg-[#ff5e3a] hover:border-[#ff5e3a] hover:text-[#0a0a0a] transition-all duration-300"

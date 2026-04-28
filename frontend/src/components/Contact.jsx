@@ -3,11 +3,13 @@ import { useContent } from "../contexts/ContentContext";
 import { profile as fallbackProfile } from "../mock";
 import api from "../lib/api";
 import { Mail, Instagram, Copy, ArrowUpRight, Send } from "lucide-react";
+import PlatformIcon from "./PlatformIcon";
 import { toast } from "sonner";
 
 const Contact = () => {
   const { content } = useContent();
   const profile = content.profile || fallbackProfile;
+  const socialProfiles = content.socialProfiles || [];
   const [form, setForm] = useState({ name: "", email: "", project: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
 
@@ -87,6 +89,30 @@ const Contact = () => {
                 <ArrowUpRight size={18} className="text-[#5b554d] group-hover:text-[#ff5e3a] group-hover:rotate-45 transition-all duration-300" />
               </div>
             </a>
+
+            {socialProfiles.map((sp) => (
+              <a
+                key={sp.id || sp.url}
+                href={sp.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block p-6 rounded-2xl bg-[#121110] border border-[#1c1916] hover:border-[#ff5e3a] transition-colors duration-300"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <PlatformIcon platform={sp.platform} size={16} className="text-[#ff5e3a]" />
+                      <span className="text-[10px] uppercase tracking-[0.25em] text-[#8a8278]">{sp.label || sp.platform}</span>
+                    </div>
+                    <div className="font-display text-2xl md:text-3xl text-[#f3ede1]">{sp.handle || sp.tagline || "View Profile"}</div>
+                    {sp.tagline && sp.handle && (
+                      <div className="mt-1 text-xs text-[#8a8278]">{sp.tagline}</div>
+                    )}
+                  </div>
+                  <ArrowUpRight size={18} className="text-[#5b554d] group-hover:text-[#ff5e3a] group-hover:rotate-45 transition-all duration-300" />
+                </div>
+              </a>
+            ))}
 
             <div className="p-6 rounded-2xl border border-dashed border-[#2a2520]">
               <div className="text-[10px] uppercase tracking-[0.25em] text-[#8a8278] mb-2">Currently</div>
