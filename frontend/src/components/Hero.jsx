@@ -31,7 +31,7 @@ const Hero = () => {
               {profile.tagline.split(",").slice(1).join(",")}.
             </p>
             <p className="mt-6 text-sm md:text-base text-[#8a8278] max-w-xl rise" style={{ animationDelay: "0.25s" }}>
-              {profile.bio}
+              {profile.shortBio}
             </p>
 
             <div className="mt-10 flex flex-wrap gap-4 rise" style={{ animationDelay: "0.35s" }}>

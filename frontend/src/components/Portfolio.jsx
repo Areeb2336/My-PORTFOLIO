@@ -4,6 +4,7 @@ import Hero from "./Hero";
 import Marquee from "./Marquee";
 import About from "./About";
 import Services from "./Services";
+import Roadmap from "./Roadmap";
 import Work from "./Work";
 import Contact from "./Contact";
 import Footer from "./Footer";
@@ -17,6 +18,7 @@ const Portfolio = () => {
         <Marquee />
         <About />
         <Services />
+        <Roadmap />
         <Work />
         <Contact />
       </main>
