@@ -1,30 +1,35 @@
 import React, { useState } from "react";
-import { profile } from "../mock";
+import { useContent } from "../contexts/ContentContext";
+import { profile as fallbackProfile } from "../mock";
+import api from "../lib/api";
 import { Mail, Instagram, Copy, ArrowUpRight, Send } from "lucide-react";
 import { toast } from "sonner";
 
 const Contact = () => {
+  const { content } = useContent();
+  const profile = content.profile || fallbackProfile;
   const [form, setForm] = useState({ name: "", email: "", project: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
       toast.error("Please fill in name, email and message.");
       return;
     }
     setSubmitting(true);
-    // Mock submit — saves locally for the frontend-only phase
-    setTimeout(() => {
-      const stored = JSON.parse(localStorage.getItem("areeb_inquiries") || "[]");
-      stored.push({ ...form, at: new Date().toISOString() });
-      localStorage.setItem("areeb_inquiries", JSON.stringify(stored));
-      toast.success("Message saved! I'll reply via email shortly.");
+    try {
+      await api.post("/contact", form);
+      toast.success("Message sent! Areeb will reply via email shortly.");
       setForm({ name: "", email: "", project: "", message: "" });
+    } catch (err) {
+      const msg = err?.response?.data?.detail || "Could not send right now. Try again or email directly.";
+      toast.error(typeof msg === "string" ? msg : "Could not send.");
+    } finally {
       setSubmitting(false);
-    }, 700);
+    }
   };
 
   const copyEmail = async () => {
@@ -113,7 +118,7 @@ const Contact = () => {
               </div>
               <div className="mt-8 flex items-center justify-between flex-wrap gap-4">
                 <div className="text-xs text-[#5b554d]">
-                  Saved locally for now — backend coming next.
+                  Sent securely — reply within 24 hours.
                 </div>
                 <button
                   type="submit"
@@ -121,7 +126,7 @@ const Contact = () => {
                   className="btn-accent inline-flex items-center gap-2 px-7 py-4 rounded-full text-sm tracking-[0.2em] uppercase font-medium disabled:opacity-60"
                 >
                   <Send size={14} />
-                  {submitting ? "Sending..." : "Send Message"}
+                  {submitting ? "Sending…" : "Send Message"}
                 </button>
               </div>
             </form>

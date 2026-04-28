@@ -1,15 +1,20 @@
 import React from "react";
-import { profile, tools, aboutFacts } from "../mock";
+import { useContent } from "../contexts/ContentContext";
+import { profile as fallbackProfile, tools as fallbackTools, aboutFacts as fallbackFacts } from "../mock";
 import { GraduationCap, MapPin, User, Sparkles } from "lucide-react";
 
 const icons = [User, GraduationCap, Sparkles, MapPin];
 
 const About = () => {
+  const { content } = useContent();
+  const profile = content.profile || fallbackProfile;
+  const tools = content.tools && content.tools.length ? content.tools : fallbackTools;
+  const facts = content.aboutFacts && content.aboutFacts.length ? content.aboutFacts : fallbackFacts;
+
   return (
     <section id="about" className="py-24 md:py-36 relative">
       <div className="max-w-[1400px] mx-auto px-6 md:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Photo column */}
           <div className="lg:col-span-5">
             <div className="relative">
               <div className="absolute -inset-3 bg-[#ff5e3a]/10 rounded-3xl blur-xl" aria-hidden />
@@ -21,24 +26,23 @@ const About = () => {
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
-                  <div>
-                    <div className="font-display text-3xl text-[#f3ede1] leading-none">{profile.name}</div>
-                    <div className="mt-2 text-xs uppercase tracking-[0.25em] text-[#d8cfc1]">{profile.role}</div>
+                <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="font-display text-3xl text-[#f3ede1] leading-none truncate">{profile.name}</div>
+                    <div className="mt-2 text-xs uppercase tracking-[0.25em] text-[#d8cfc1] line-clamp-2">{profile.role}</div>
                   </div>
-                  <span className="text-[10px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-full bg-[#ff5e3a] text-[#0a0a0a] font-medium">
+                  <span className="text-[10px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-full bg-[#ff5e3a] text-[#0a0a0a] font-medium shrink-0">
                     Hello
                   </span>
                 </div>
               </div>
               <div className="mt-5 flex items-center justify-between text-xs uppercase tracking-[0.25em] text-[#8a8278]">
-                <span>Greater Noida · India</span>
+                <span>{profile.location}</span>
                 <span className="font-script normal-case tracking-normal text-[#ff5e3a] text-2xl">est. 2025</span>
               </div>
             </div>
           </div>
 
-          {/* Content column */}
           <div className="lg:col-span-7 lg:pl-4">
             <div className="text-xs uppercase tracking-[0.3em] text-[#ff5e3a] mb-6 flex items-center gap-3">
               <span className="w-8 h-px bg-[#ff5e3a]" />
@@ -52,13 +56,13 @@ const About = () => {
               by night.
             </h2>
 
-            <p className="mt-8 text-lg md:text-xl leading-relaxed text-[#d8cfc1]">
+            <p className="mt-8 text-lg md:text-xl leading-relaxed text-[#d8cfc1] whitespace-pre-line">
               {profile.longBio}
             </p>
 
             <div className="mt-10 grid grid-cols-2 gap-4">
-              {aboutFacts.map((item, i) => {
-                const Icon = icons[i];
+              {facts.map((item, i) => {
+                const Icon = icons[i % icons.length];
                 return (
                   <div key={i} className="p-5 rounded-2xl bg-[#121110] border border-[#1c1916] hover-lift">
                     <Icon className="text-[#ff5e3a] mb-3" size={18} />

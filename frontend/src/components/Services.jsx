@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import { services } from "../mock";
+import { useContent } from "../contexts/ContentContext";
+import { services as fallbackServices } from "../mock";
 import { ArrowUpRight, Check } from "lucide-react";
 
 const Services = () => {
+  const { content } = useContent();
+  const services = content.services && content.services.length ? content.services : fallbackServices;
   const [active, setActive] = useState(0);
+  const cur = services[active] || services[0];
 
   return (
     <section id="services" className="py-24 md:py-36 bg-[#0c0b0a] border-y border-[#1c1916]">
@@ -27,7 +31,7 @@ const Services = () => {
           <div className="lg:col-span-7 divide-y divide-[#1c1916] border-y border-[#1c1916]">
             {services.map((s, i) => (
               <button
-                key={s.id}
+                key={s.id || i}
                 onMouseEnter={() => setActive(i)}
                 onClick={() => setActive(i)}
                 className="group w-full flex items-center justify-between gap-6 py-7 md:py-9 px-2 md:px-4 text-left transition-colors duration-300 hover:bg-[#0a0a0a]"
@@ -54,27 +58,29 @@ const Services = () => {
           <div className="lg:col-span-5">
             <div className="sticky top-32 p-8 md:p-10 rounded-2xl bg-[#121110] border border-[#1c1916] min-h-[420px]">
               <div className="text-xs uppercase tracking-[0.25em] text-[#8a8278] mb-4">
-                {services[active].number} — Currently viewing
+                {cur.number} — Currently viewing
               </div>
               <h3 className="font-display text-3xl md:text-4xl text-[#f3ede1] mb-5 leading-tight">
-                {services[active].title}
+                {cur.title}
               </h3>
               <p className="text-[#d8cfc1] text-base md:text-lg leading-relaxed">
-                {services[active].description}
+                {cur.description}
               </p>
-              <div className="mt-8">
-                <div className="text-[10px] uppercase tracking-[0.25em] text-[#8a8278] mb-4">Deliverables</div>
-                <ul className="space-y-3">
-                  {services[active].deliverables.map((d) => (
-                    <li key={d} className="flex items-center gap-3 text-[#d8cfc1]">
-                      <span className="w-6 h-6 rounded-full bg-[#ff5e3a]/15 flex items-center justify-center shrink-0">
-                        <Check size={12} className="text-[#ff5e3a]" />
-                      </span>
-                      {d}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {cur.deliverables && cur.deliverables.length > 0 && (
+                <div className="mt-8">
+                  <div className="text-[10px] uppercase tracking-[0.25em] text-[#8a8278] mb-4">Deliverables</div>
+                  <ul className="space-y-3">
+                    {cur.deliverables.map((d) => (
+                      <li key={d} className="flex items-center gap-3 text-[#d8cfc1]">
+                        <span className="w-6 h-6 rounded-full bg-[#ff5e3a]/15 flex items-center justify-center shrink-0">
+                          <Check size={12} className="text-[#ff5e3a]" />
+                        </span>
+                        {d}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -1,8 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { navLinks, profile } from "../mock";
+import { useContent } from "../contexts/ContentContext";
+import { profile as fallbackProfile } from "../mock";
 import { Menu, X } from "lucide-react";
 
+const defaultLinks = [
+  { label: "About", href: "#about" },
+  { label: "Services", href: "#services" },
+  { label: "Learning", href: "#roadmap" },
+  { label: "Work", href: "#work" },
+  { label: "Contact", href: "#contact" },
+];
+
 const Header = () => {
+  const { content } = useContent();
+  const profile = content.profile || fallbackProfile;
+  const navLinks = defaultLinks;
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -28,13 +40,13 @@ const Header = () => {
         <button
           onClick={() => handleNav("#top")}
           className="flex items-center gap-2 group"
-          aria-label="Areeb Rayyan home"
+          aria-label={`${profile.name} home`}
         >
           <span className="w-9 h-9 rounded-full bg-[#ff5e3a] flex items-center justify-center text-[#0a0a0a] font-display text-lg leading-none">
-            A
+            {(profile.shortName || profile.name || "A").charAt(0)}
           </span>
           <span className="hidden sm:flex flex-col leading-tight text-left">
-            <span className="font-display text-xl tracking-wide">{profile.shortName}</span>
+            <span className="font-display text-xl tracking-wide">{profile.shortName || profile.name}</span>
             <span className="text-[10px] uppercase tracking-[0.2em] text-[#8a8278]">Photoshop · Freelance</span>
           </span>
         </button>

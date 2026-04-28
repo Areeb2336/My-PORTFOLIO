@@ -65,55 +65,34 @@ export const services = [
 export const portfolioItems = [
   {
     id: 1,
-    title: "Eyewear Cutout",
+    title: "Red Pickup Truck Cutout",
     category: "Background Removal",
     year: "2025",
-    image: "https://images.unsplash.com/photo-1686165862816-ed104011f9a9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHw0fHxwcm9kdWN0JTIwcGhvdG9ncmFwaHklMjB3aGl0ZSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc3Mzk5NjA3fDA&ixlib=rb-4.1.0&q=85",
-    isPlaceholder: true,
+    description: "Removed dark studio backdrop, kept clean edges and reflective highlights intact.",
+    image: "https://customer-assets.emergentagent.com/job_areeb-portfolio/artifacts/c8dh4mg1_portfolio%201%20sample%202.png",
+    isPlaceholder: false,
   },
   {
     id: 2,
-    title: "Sneaker Isolation",
+    title: "Elephant Subject Isolation",
     category: "Background Removal",
     year: "2025",
-    image: "https://images.unsplash.com/photo-1625860191460-10a66c7384fb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHwxfHxwcm9kdWN0JTIwcGhvdG9ncmFwaHklMjB3aGl0ZSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc3Mzk5NjA3fDA&ixlib=rb-4.1.0&q=85",
-    isPlaceholder: true,
+    description: "Isolated subject from a busy outdoor scene — fine tusk and trunk edges preserved.",
+    image: "https://customer-assets.emergentagent.com/job_areeb-portfolio/artifacts/kidhz996_portfolio%201%20sample%203.png",
+    isPlaceholder: false,
   },
   {
     id: 3,
-    title: "Beverage Composite",
-    category: "Compositing",
-    year: "2025",
-    image: "https://images.pexels.com/photos/9462395/pexels-photo-9462395.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-    isPlaceholder: true,
-  },
-  {
-    id: 4,
-    title: "Cosmetic Brand Shot",
+    title: "Trees & Meadow Cleanup",
     category: "Background Removal",
     year: "2025",
-    image: "https://images.pexels.com/photos/29611520/pexels-photo-29611520.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-    isPlaceholder: true,
-  },
-  {
-    id: 5,
-    title: "Sky Replacement Demo",
-    category: "Sky Replacement",
-    year: "2025",
-    image: "https://images.unsplash.com/photo-1762522903557-891c8dc11f4b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MTJ8MHwxfHNlYXJjaHwxfHxwaG90byUyMHJldG91Y2hpbmd8ZW58MHx8fHwxNzc3Mzk5NjEyfDA&ixlib=rb-4.1.0&q=85",
-    isPlaceholder: true,
-  },
-  {
-    id: 6,
-    title: "Studio Cutout",
-    category: "Compositing",
-    year: "2025",
-    image: "https://images.unsplash.com/photo-1762522926262-d96de462ad54?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MTJ8MHwxfHNlYXJjaHwyfHxwaG90byUyMHJldG91Y2hpbmd8ZW58MHx8fHwxNzc3Mzk5NjEyfDA&ixlib=rb-4.1.0&q=85",
-    isPlaceholder: true,
+    description: "Removed sky and refined leaf edges for a natural, drop-in-anywhere asset.",
+    image: "https://customer-assets.emergentagent.com/job_areeb-portfolio/artifacts/ymfu8rkn_portfolio%201%20sample%201.png",
+    isPlaceholder: false,
   },
 ];
 
-export const portfolioCategories = ["All", "Background Removal", "Sky Replacement", "Compositing"];
+export const portfolioCategories = ["All", "Background Removal"];
 
 export const stats = [
   { value: "70+", label: "Photoshop lessons cleared" },

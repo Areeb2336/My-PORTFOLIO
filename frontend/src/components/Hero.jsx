@@ -1,12 +1,26 @@
 import React from "react";
 import { ArrowDownRight, Sparkles } from "lucide-react";
-import { profile, stats } from "../mock";
+import { useContent } from "../contexts/ContentContext";
+import { profile as fallbackProfile, stats as fallbackStats } from "../mock";
 
 const Hero = () => {
+  const { content } = useContent();
+  const profile = content.profile || fallbackProfile;
+  const stats = content.stats && content.stats.length ? content.stats : fallbackStats;
+
   const scrollTo = (id) => {
     const el = document.querySelector(id);
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
+
+  const taglineParts = (profile.tagline || "").split(",");
+  const taglineFirst = taglineParts[0] || "";
+  const taglineRest = taglineParts.slice(1).join(",");
+
+  // Render name as two lines (split into 2 if has space, else as single)
+  const nameParts = (profile.name || "").trim().split(" ");
+  const firstName = nameParts[0] || "";
+  const restName = nameParts.slice(1).join(" ");
 
   return (
     <section id="top" className="relative pt-32 md:pt-40 pb-16 md:pb-24">
@@ -17,18 +31,22 @@ const Hero = () => {
           <span className="text-xs tracking-[0.3em] uppercase text-[#8a8278]">{profile.status}</span>
         </div>
 
-        <h1 className="font-display text-[18vw] md:text-[12vw] lg:text-[11.5rem] leading-[0.85] tracking-tight rise">
-          AREEB
-          <br />
-          <span className="text-[#ff5e3a]">RAYYAN</span>
+        <h1 className="font-display text-[18vw] md:text-[12vw] lg:text-[11.5rem] leading-[0.85] tracking-tight rise uppercase">
+          {firstName}
+          {restName && (
+            <>
+              <br />
+              <span className="text-[#ff5e3a]">{restName}</span>
+            </>
+          )}
           <span className="font-serif-italic text-[#f3ede1] text-[10vw] md:text-[6vw] lg:text-[5rem] align-super ml-2">.</span>
         </h1>
 
         <div className="mt-10 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-end">
           <div className="md:col-span-7">
             <p className="text-lg md:text-2xl leading-relaxed text-[#d8cfc1] max-w-2xl rise" style={{ animationDelay: "0.15s" }}>
-              <span className="font-script text-[#ff5e3a] text-3xl md:text-4xl mr-1">{profile.tagline.split(",")[0]},</span>
-              {profile.tagline.split(",").slice(1).join(",")}.
+              <span className="font-script text-[#ff5e3a] text-3xl md:text-4xl mr-1">{taglineFirst}{taglineRest ? "," : ""}</span>
+              {taglineRest}.
             </p>
             <p className="mt-6 text-sm md:text-base text-[#8a8278] max-w-xl rise" style={{ animationDelay: "0.25s" }}>
               {profile.shortBio}
