@@ -111,12 +111,20 @@ const MessagesManager = () => {
                   <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-[#5b554d]">{new Date(m.created_at).toLocaleString()}</div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <a
-                    href={`mailto:${m.email}?subject=Re: ${encodeURIComponent(m.project || "Your enquiry")}`}
+                  <button
+                    onClick={() => {
+                      const subject = encodeURIComponent(`Re: ${m.project || "Your enquiry"}`);
+                      const body = encodeURIComponent(`Hi ${m.name},\n\nThanks for reaching out about "${m.project || "your project"}".\n\n`);
+                      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(m.email)}&su=${subject}&body=${body}`;
+                      window.open(gmailUrl, "_blank", "noopener,noreferrer");
+                      navigator.clipboard?.writeText(m.email).catch(() => {});
+                      toast.success("Opening Gmail — email copied to clipboard too");
+                      if (!m.read) markRead(m.id);
+                    }}
                     className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-[#2a2520] text-xs text-[#d8cfc1] hover:border-[#ff5e3a] hover:text-[#ff5e3a]"
                   >
                     <Mail size={13} /> Reply
-                  </a>
+                  </button>
                   {!m.read && (
                     <button onClick={() => markRead(m.id)} className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-[#2a2520] text-xs text-[#d8cfc1] hover:border-[#ff5e3a] hover:text-[#ff5e3a]">
                       <Check size={13} /> Mark read
