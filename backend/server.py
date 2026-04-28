@@ -316,10 +316,10 @@ DEFAULT_CONTENT = {
         "instagramUrl": "https://instagram.com/_digitalarru",
     },
     "stats": [
-        {"value": "70+", "label": "Photoshop lessons cleared"},
-        {"value": "6", "label": "Course projects done"},
-        {"value": "4", "label": "Adobe tools incoming"},
         {"value": "24h", "label": "Avg. reply time"},
+        {"value": "Free", "label": "Revisions until happy"},
+        {"value": "1:1", "label": "Direct chat with me"},
+        {"value": "₹", "label": "Student-friendly rates"},
     ],
     "tools": [
         "Pen Tool", "Layer Masks", "Select & Mask", "Refine Edge", "Magic Wand",
