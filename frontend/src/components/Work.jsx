@@ -22,7 +22,7 @@ const Work = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const safeItems = Array.isArray(items) ? items : [];
+  const safeItems = useMemo(() => (Array.isArray(items) ? items : []), [items]);
 
   const categories = useMemo(() => {
     const set = new Set(safeItems.map((i) => i.category).filter(Boolean));
