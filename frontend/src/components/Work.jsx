@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import api, { resolveImageUrl } from "../lib/api";
 import { ArrowUpRight, Construction } from "lucide-react";
+import BeforeAfterSlider from "./BeforeAfterSlider";
 
 const Work = () => {
   const [items, setItems] = useState([]);
@@ -79,16 +80,25 @@ const Work = () => {
                 }`}
               >
                 <div className="relative aspect-[4/5] overflow-hidden bg-white">
-                  <img
-                    src={resolveImageUrl(item.image_url || item.image)}
-                    alt={item.title}
-                    loading="lazy"
-                    className="w-full h-full object-contain"
-                  />
-                  <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#ff5e3a] text-[#0a0a0a]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#0a0a0a]" />
-                    <span className="text-[10px] uppercase tracking-[0.2em] font-medium">Real Work</span>
-                  </div>
+                  {item.before_image_url ? (
+                    <BeforeAfterSlider
+                      beforeSrc={resolveImageUrl(item.before_image_url)}
+                      afterSrc={resolveImageUrl(item.image_url)}
+                    />
+                  ) : (
+                    <>
+                      <img
+                        src={resolveImageUrl(item.image_url || item.image)}
+                        alt={item.title}
+                        loading="lazy"
+                        className="w-full h-full object-contain"
+                      />
+                      <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#ff5e3a] text-[#0a0a0a]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#0a0a0a]" />
+                        <span className="text-[10px] uppercase tracking-[0.2em] font-medium">Real Work</span>
+                      </div>
+                    </>
+                  )}
                 </div>
                 <div className="p-6 flex items-center justify-between gap-4">
                   <div className="min-w-0">

@@ -18,6 +18,7 @@ const GalleryManager = () => {
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState({});
   const fileRef = useRef(null);
+  const beforeRef = useRef(null);
 
   const [newItem, setNewItem] = useState({
     title: "",
@@ -26,6 +27,8 @@ const GalleryManager = () => {
     description: "",
     file: null,
     preview: "",
+    beforeFile: null,
+    beforePreview: "",
   });
 
   const load = async () => {
@@ -54,6 +57,16 @@ const GalleryManager = () => {
     setNewItem({ ...newItem, file, preview });
   };
 
+  const handleBeforeFile = (file) => {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Before image too large (max 10MB)");
+      return;
+    }
+    const beforePreview = URL.createObjectURL(file);
+    setNewItem({ ...newItem, beforeFile: file, beforePreview });
+  };
+
   const handleUpload = async (e) => {
     e.preventDefault();
     if (!newItem.file) {
@@ -68,6 +81,7 @@ const GalleryManager = () => {
     try {
       const fd = new FormData();
       fd.append("image", newItem.file);
+      if (newItem.beforeFile) fd.append("before_image", newItem.beforeFile);
       fd.append("title", newItem.title);
       fd.append("category", newItem.category);
       fd.append("year", newItem.year);
@@ -77,8 +91,9 @@ const GalleryManager = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Image added to gallery");
-      setNewItem({ title: "", category: "Background Removal", year: new Date().getFullYear().toString(), description: "", file: null, preview: "" });
+      setNewItem({ title: "", category: "Background Removal", year: new Date().getFullYear().toString(), description: "", file: null, preview: "", beforeFile: null, beforePreview: "" });
       if (fileRef.current) fileRef.current.value = "";
+      if (beforeRef.current) beforeRef.current.value = "";
       load();
     } catch (err) {
       toast.error(err?.response?.data?.detail || "Upload failed");
@@ -130,29 +145,56 @@ const GalleryManager = () => {
 
         <form onSubmit={handleUpload} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Image picker */}
-          <div>
-            <label className="text-[10px] uppercase tracking-[0.25em] text-[#8a8278]">Image</label>
-            <div
-              onClick={() => fileRef.current?.click()}
-              className="mt-2 cursor-pointer aspect-[4/3] rounded-xl border-2 border-dashed border-[#2a2520] hover:border-[#ff5e3a] transition-colors flex items-center justify-center overflow-hidden bg-[#0c0b0a]"
-            >
-              {newItem.preview ? (
-                <img src={newItem.preview} alt="preview" className="w-full h-full object-contain" />
-              ) : (
-                <div className="text-center text-[#5b554d]">
-                  <ImageIcon size={28} className="mx-auto mb-2" />
-                  <div className="text-sm">Click to choose image</div>
-                  <div className="text-[10px] uppercase tracking-[0.2em] mt-1">JPG, PNG, WEBP · max 10MB</div>
-                </div>
-              )}
+          <div className="space-y-4">
+            <div>
+              <label className="text-[10px] uppercase tracking-[0.25em] text-[#8a8278]">After image (final result)</label>
+              <div
+                onClick={() => fileRef.current?.click()}
+                className="mt-2 cursor-pointer aspect-[4/3] rounded-xl border-2 border-dashed border-[#2a2520] hover:border-[#ff5e3a] transition-colors flex items-center justify-center overflow-hidden bg-[#0c0b0a]"
+              >
+                {newItem.preview ? (
+                  <img src={newItem.preview} alt="preview" className="w-full h-full object-contain" />
+                ) : (
+                  <div className="text-center text-[#5b554d]">
+                    <ImageIcon size={28} className="mx-auto mb-2" />
+                    <div className="text-sm">Click to choose AFTER image</div>
+                    <div className="text-[10px] uppercase tracking-[0.2em] mt-1">JPG, PNG, WEBP · max 10MB</div>
+                  </div>
+                )}
+              </div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => handleFile(e.target.files?.[0])}
+                className="hidden"
+              />
             </div>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={(e) => handleFile(e.target.files?.[0])}
-              className="hidden"
-            />
+
+            <div>
+              <label className="text-[10px] uppercase tracking-[0.25em] text-[#8a8278]">Before image (optional — enables slider)</label>
+              <div
+                onClick={() => beforeRef.current?.click()}
+                className="mt-2 cursor-pointer aspect-[4/3] rounded-xl border-2 border-dashed border-[#2a2520] hover:border-[#ff5e3a] transition-colors flex items-center justify-center overflow-hidden bg-[#0c0b0a]"
+              >
+                {newItem.beforePreview ? (
+                  <img src={newItem.beforePreview} alt="before preview" className="w-full h-full object-contain" />
+                ) : (
+                  <div className="text-center text-[#5b554d]">
+                    <ImageIcon size={24} className="mx-auto mb-2" />
+                    <div className="text-sm">Click to choose BEFORE image</div>
+                    <div className="text-[10px] uppercase tracking-[0.2em] mt-1">Optional · adds drag-slider</div>
+                  </div>
+                )}
+              </div>
+              <input
+                ref={beforeRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => handleBeforeFile(e.target.files?.[0])}
+                className="hidden"
+              />
+            </div>
           </div>
 
           {/* Fields */}
@@ -161,6 +203,9 @@ const GalleryManager = () => {
             <FieldSelect label="Category" value={newItem.category} options={CATEGORY_OPTIONS} onChange={(v) => setNewItem({ ...newItem, category: v })} />
             <FieldText label="Year" value={newItem.year} onChange={(v) => setNewItem({ ...newItem, year: v })} placeholder="2025" />
             <FieldText label="Short description" value={newItem.description} onChange={(v) => setNewItem({ ...newItem, description: v })} placeholder="Optional" />
+            <div className="text-[11px] text-[#8a8278] leading-relaxed p-3 rounded-lg bg-[#0c0b0a] border border-[#1c1916]">
+              💡 <strong className="text-[#d8cfc1]">Pro tip:</strong> Upload BOTH before & after — your gallery will show a draggable slider so visitors can <em>see</em> your editing magic in real time.
+            </div>
             <button
               type="submit"
               disabled={uploading}

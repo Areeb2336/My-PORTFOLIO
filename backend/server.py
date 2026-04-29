@@ -150,6 +150,7 @@ class PortfolioItem(BaseModel):
     year: str = ""
     description: str = ""
     image_url: str
+    before_image_url: Optional[str] = None
     order: int = 0
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -245,16 +246,22 @@ async def create_portfolio_item(
     description: str = Form(""),
     order: int = Form(0),
     image: UploadFile = File(...),
+    before_image: Optional[UploadFile] = File(None),
     _: str = Depends(require_admin),
 ):
     ext = _validate_upload(image)
     image_url = _save_upload(image, ext)
+    before_url = None
+    if before_image is not None and before_image.filename:
+        bext = _validate_upload(before_image)
+        before_url = _save_upload(before_image, bext)
     item = PortfolioItem(
         title=title.strip(),
         category=category.strip() or "Background Removal",
         year=year.strip(),
         description=description.strip(),
         image_url=image_url,
+        before_image_url=before_url,
         order=order,
     )
     await db.portfolio.insert_one(item.model_dump())
@@ -279,15 +286,15 @@ async def delete_portfolio_item(item_id: str, _: str = Depends(require_admin)):
     item = await db.portfolio.find_one({"id": item_id})
     if not item:
         raise HTTPException(status_code=404, detail="Portfolio item not found")
-    image_url = item.get("image_url", "")
-    # Best-effort file cleanup if it's a local upload
-    if image_url.startswith("/api/uploads/portfolio/"):
-        fname = image_url.split("/")[-1]
-        fpath = PORTFOLIO_DIR / fname
-        try:
-            fpath.unlink(missing_ok=True)
-        except Exception as e:
-            logging.warning(f"Could not delete file {fpath}: {e}")
+    for url_key in ("image_url", "before_image_url"):
+        url = item.get(url_key) or ""
+        if url.startswith("/api/uploads/portfolio/"):
+            fname = url.split("/")[-1]
+            fpath = PORTFOLIO_DIR / fname
+            try:
+                fpath.unlink(missing_ok=True)
+            except Exception as e:
+                logging.warning(f"Could not delete file {fpath}: {e}")
     await db.portfolio.delete_one({"id": item_id})
     return {"deleted": True, "id": item_id}
 
