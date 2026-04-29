@@ -10,21 +10,32 @@ const Work = () => {
 
   useEffect(() => {
     api.get("/portfolio")
-.then((r) => setItems(Array.isArray(r.data) ? r.data : []))
+      .then((r) => {
+        const data = Array.isArray(r.data)
+          ? r.data
+          : Array.isArray(r.data?.data)
+          ? r.data.data
+          : [];
+        setItems(data);
+      })
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
   }, []);
-const safeItems = Array.isArray(items) ? items : [];
-  
-  const categories = useMemo(() => {
-  const set = new Set(safeItems.map((i) => i.category).filter(Boolean));
-  return ["All", ...Array.from(set)];
-}, [safeItems]);
 
-const filtered = useMemo(
-  () => (filter === "All" ? safeItems : safeItems.filter((i) => i.category === filter)),
-  [filter, safeItems]
-);
+  const safeItems = Array.isArray(items) ? items : [];
+
+  const categories = useMemo(() => {
+    const set = new Set(safeItems.map((i) => i.category).filter(Boolean));
+    return ["All", ...Array.from(set)];
+  }, [safeItems]);
+
+  const filtered = useMemo(
+    () =>
+      filter === "All"
+        ? safeItems
+        : safeItems.filter((i) => i.category === filter),
+    [filter, safeItems]
+  );
 
   return (
     <section id="work" className="py-24 md:py-36">
@@ -42,6 +53,7 @@ const filtered = useMemo(
               A growing collection of real edits. New work added as I take on more freelance briefs.
             </p>
           </div>
+
           {categories.length > 1 && (
             <div className="flex flex-wrap gap-2">
               {categories.map((c) => (
@@ -75,7 +87,7 @@ const filtered = useMemo(
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((item, i) => (
               <article
-                key={item.id}
+                key={item.id || i}
                 className={`group relative overflow-hidden rounded-2xl bg-[#121110] border border-[#1c1916] hover-lift img-hover ${
                   i === 0 && filtered.length >= 3 ? "sm:col-span-2 lg:col-span-2" : ""
                 }`}
@@ -90,24 +102,28 @@ const filtered = useMemo(
                     <>
                       <img
                         src={resolveImageUrl(item.image_url || item.image)}
-                        alt={item.title}
+                        alt={item.title || "Work image"}
                         loading="lazy"
                         className="w-full h-full object-contain"
                       />
                       <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#ff5e3a] text-[#0a0a0a]">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#0a0a0a]" />
-                        <span className="text-[10px] uppercase tracking-[0.2em] font-medium">Real Work</span>
+                        <span className="text-[10px] uppercase tracking-[0.2em] font-medium">
+                          Real Work
+                        </span>
                       </div>
                     </>
                   )}
                 </div>
+
                 <div className="p-6 flex items-center justify-between gap-4">
                   <div className="min-w-0">
                     <div className="text-[10px] uppercase tracking-[0.25em] text-[#8a8278] mb-1">
-                      {item.category}{item.year ? ` · ${item.year}` : ""}
+                      {item.category}
+                      {item.year ? ` · ${item.year}` : ""}
                     </div>
                     <div className="font-display text-2xl text-[#f3ede1] group-hover:text-[#ff5e3a] transition-colors truncate">
-                      {item.title}
+                      {item.title || "Untitled work"}
                     </div>
                   </div>
                   <span className="w-10 h-10 rounded-full border border-[#2a2520] flex items-center justify-center text-[#8a8278] group-hover:bg-[#ff5e3a] group-hover:border-[#ff5e3a] group-hover:text-[#0a0a0a] transition-all duration-300 shrink-0">
