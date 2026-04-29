@@ -10,20 +10,21 @@ const Work = () => {
 
   useEffect(() => {
     api.get("/portfolio")
-      .then((r) => setItems(r.data || []))
+.then((r) => setItems(Array.isArray(r.data) ? r.data : []))
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
   }, []);
-
+const safeItems = Array.isArray(items) ? items : [];
+  
   const categories = useMemo(() => {
-    const set = new Set(items.map((i) => i.category).filter(Boolean));
-    return ["All", ...Array.from(set)];
-  }, [items]);
+  const set = new Set(safeItems.map((i) => i.category).filter(Boolean));
+  return ["All", ...Array.from(set)];
+}, [safeItems]);
 
-  const filtered = useMemo(
-    () => (filter === "All" ? items : items.filter((i) => i.category === filter)),
-    [filter, items]
-  );
+const filtered = useMemo(
+  () => (filter === "All" ? safeItems : safeItems.filter((i) => i.category === filter)),
+  [filter, safeItems]
+);
 
   return (
     <section id="work" className="py-24 md:py-36">
